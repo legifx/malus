@@ -2,6 +2,8 @@ import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { Apple } from '../components/Apple'
+import { useActReady, HERO_DETAIL } from '../scroll/useActReady'
+import { useMalus } from '../store'
 import { scroll } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
@@ -42,7 +44,23 @@ const WAX_IN = [0.16, 0.42] as const
 const TIGHTEN = [0.40, 0.66] as const
 const UV_IN = [0.66, 0.80] as const
 
+/**
+ * Gate and body are separate components on purpose.
+ *
+ * Putting `if (!ready) return null` inside the body would sit AFTER the hooks
+ * that build the geometry, so everything would still be constructed on the
+ * first render and the gate would buy nothing. Only an unmounted subtree
+ * actually skips the work.
+ */
 export function Skin() {
+  const ready = useActReady(1)
+  if (!ready) return null
+  return <SkinBody />
+}
+
+function SkinBody() {
+  const quality = useMalus((st) => st.quality)
+  const detail = HERO_DETAIL[quality]
   const root = useRef<THREE.Group>(null)
   const uv = useRef<THREE.Points>(null)
   const camera = useThree((s) => s.camera)
@@ -129,7 +147,7 @@ export function Skin() {
           subject rather than the object. */}
       <Apple
         seed={7}
-        detail={56}
+        detail={detail}
         character={0.38}
         withStem={false}
         onSkinUniforms={(u) => { skinRef.current = u }}

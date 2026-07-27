@@ -42,7 +42,28 @@ function radiusProfile(t: number): number {
   return 1 + shoulder - taper
 }
 
-export function makeAppleGeometry({
+/**
+ * Identical apples are shared.
+ *
+ * Act IV alone asks for two (its upper and lower halves) and act V for a third,
+ * all with the same seed, detail and character — three copies of the same 33k
+ * triangles sitting in memory for no reason. Keyed on everything that changes
+ * the result, so a cache hit is always genuinely the same geometry.
+ *
+ * Consequence: callers must NOT dispose what they get back.
+ */
+const cache = new Map<string, THREE.BufferGeometry>()
+
+export function makeAppleGeometry(params: AppleParams = {}): THREE.BufferGeometry {
+  const key = `${params.seed ?? 1}/${params.detail ?? 40}/${params.character ?? 0.5}`
+  const hit = cache.get(key)
+  if (hit) return hit
+  const made = buildAppleGeometry(params)
+  cache.set(key, made)
+  return made
+}
+
+function buildAppleGeometry({
   seed = 1,
   detail = 40,
   character = 0.5,

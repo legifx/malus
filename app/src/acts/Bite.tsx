@@ -4,6 +4,8 @@ import * as THREE from 'three'
 import CustomShaderMaterial from 'three-custom-shader-material'
 import { makeFracturedApple } from '../geometry/fracture'
 import { appleBurstVertex, appleBurstFragment, APPLE_BURST_DEFAULTS } from '../materials/appleBurst'
+import { useActReady, FRACTURE } from '../scroll/useActReady'
+import { useMalus } from '../store'
 import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
@@ -39,15 +41,30 @@ const MEALY_END = 0.84
 
 const ORIGIN = new THREE.Vector3(0.35, 0.25, 0.9).normalize()
 
+/**
+ * Gate and body are separate components on purpose.
+ *
+ * Putting `if (!ready) return null` inside the body would sit AFTER the hooks
+ * that build the geometry, so everything would still be constructed on the
+ * first render and the gate would buy nothing. Only an unmounted subtree
+ * actually skips the work.
+ */
 export function Bite() {
+  const ready = useActReady(2)
+  if (!ready) return null
+  return <BiteBody />
+}
+
+function BiteBody() {
+  const quality = useMalus((st) => st.quality)
   const root = useRef<THREE.Group>(null)
   const spin = useRef<THREE.Group>(null)
   const juice = useRef<THREE.Points>(null)
   const camera = useThree((s) => s.camera)
 
   const { geometry, restY } = useMemo(
-    () => makeFracturedApple({ seed: 7, detail: 30, cells: 34, origin: ORIGIN, character: 0.38 }),
-    [],
+    () => makeFracturedApple({ ...FRACTURE[quality], seed: 7, origin: ORIGIN, character: 0.38 }),
+    [quality],
   )
 
   const uniforms = useMemo(() => {

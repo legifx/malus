@@ -11,7 +11,7 @@ export const CUT_AT = 0.05
  * circular cap either overhangs the skin or leaves a gap showing the inside of
  * the shell. The outline is sampled straight off the geometry instead.
  */
-export function makeCutDisc(seed = 7, detail = 40, segments = 160) {
+export function makeCutDisc(seed = 7, detail = 44, segments = 160) {
   const geo = makeAppleGeometry({ seed, detail, character: 0.38 })
   const cutY = CUT_AT
   const pos = geo.attributes.position as THREE.BufferAttribute
@@ -53,7 +53,7 @@ export function makeCutDisc(seed = 7, detail = 40, segments = 160) {
   g.computeVertexNormals()
   let rmax = 0
   for (const r of radii) rmax = Math.max(rmax, r)
-  geo.dispose()
+  // Not disposed: makeAppleGeometry hands out a shared instance.
   return { geometry: g, radius: rmax }
 }
 

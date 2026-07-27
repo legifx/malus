@@ -5,6 +5,8 @@ import CustomShaderMaterial from 'three-custom-shader-material'
 import { Apple } from '../components/Apple'
 import { makeCutDisc, CUT_AT } from '../geometry/cutDisc'
 import { cutFaceVertex, cutFaceFragment, CUT_FACE_DEFAULTS } from '../materials/cutFace'
+import { useActReady, HERO_DETAIL } from '../scroll/useActReady'
+import { useMalus } from '../store'
 import { scroll, signals } from '../scroll/acts'
 
 /**
@@ -37,12 +39,28 @@ const smoothstep = (a: number, b: number, x: number) => {
 const DROP_AT = 0.56
 const DROP_XY = new THREE.Vector2(-0.20, 0.16)
 
+/**
+ * Gate and body are separate components on purpose.
+ *
+ * Putting `if (!ready) return null` inside the body would sit AFTER the hooks
+ * that build the geometry, so everything would still be constructed on the
+ * first render and the gate would buy nothing. Only an unmounted subtree
+ * actually skips the work.
+ */
 export function Time() {
+  const ready = useActReady(4)
+  if (!ready) return null
+  return <TimeBody />
+}
+
+function TimeBody() {
+  const quality = useMalus((st) => st.quality)
+  const detail = HERO_DETAIL[quality]
   const root = useRef<THREE.Group>(null)
   const drop = useRef<THREE.Mesh>(null)
   const camera = useThree((s) => s.camera)
 
-  const { geometry: disc, radius } = useMemo(() => makeCutDisc(7), [])
+  const { geometry: disc, radius } = useMemo(() => makeCutDisc(7, detail), [detail])
   const planeLower = useMemo(() => new THREE.Plane(new THREE.Vector3(0, -1, 0), CUT_AT), [])
 
   const capUniforms = useMemo(() => {
@@ -97,7 +115,7 @@ export function Time() {
 
   return (
     <group ref={root} visible={false}>
-      <Apple seed={7} detail={40} character={0.38} withStem={false} clippingPlanes={[planeLower]} />
+      <Apple seed={7} detail={detail} character={0.38} withStem={false} clippingPlanes={[planeLower]} />
       <mesh geometry={disc} position={[0, CUT_AT, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <CustomShaderMaterial
           baseMaterial={THREE.MeshPhysicalMaterial}

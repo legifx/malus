@@ -2,6 +2,8 @@ import { useMemo, useRef, useState, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { Apple } from '../components/Apple'
+import { useActReady, HERO_DETAIL } from '../scroll/useActReady'
+import { useMalus } from '../store'
 import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
@@ -40,6 +42,8 @@ const smoothstep = (a: number, b: number, x: number) => {
 }
 
 export function Fall() {
+  const quality = useMalus((st) => st.quality)
+  const detail = HERO_DETAIL[quality]
   const root = useRef<THREE.Group>(null)
   const grp = useRef<THREE.Group>(null)
   const inner = useRef<THREE.Group>(null)
@@ -166,7 +170,7 @@ export function Fall() {
     <group ref={root}>
       <group ref={grp}>
         <group ref={inner}>
-          <Apple seed={7} detail={44} character={0.38} onMetrics={onMetrics} />
+          <Apple seed={7} detail={detail} character={0.38} onMetrics={onMetrics} />
         </group>
       </group>
 

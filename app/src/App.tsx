@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing'
+import { PerformanceMonitor } from '@react-three/drei'
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
 import { Studio } from './components/Studio'
@@ -14,7 +15,7 @@ import { Seed } from './acts/Seed'
 import { Overlay } from './ui/Overlay'
 import { ScrollDriver } from './scroll/ScrollDriver'
 import { useMalus, detectQuality } from './store'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import './ui/overlay.css'
 
 function Effects() {
@@ -46,12 +47,22 @@ export function App() {
   const setQuality = useMalus((s) => s.setQuality)
   useEffect(() => setQuality(detectQuality()), [setQuality])
 
+  // Resolution is the first thing to give, not the last. Halving pixel density
+  // costs far less perceptually than losing bloom or the orchard's population,
+  // and act VI is where a weak machine will feel it.
+  //
+  // Anchored to the device's OWN pixel ratio. A fixed 1.5 on a 1x display is
+  // 2.25x the pixels for no visible gain — measured, and it cost most of the
+  // frame rate.
+  const maxDpr = Math.min(typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1, 1.75)
+  const [dpr, setDpr] = useState(maxDpr)
+
   return (
     <>
       <div className="stage">
         <Canvas
           shadows
-          dpr={[1, 1.75]}
+          dpr={dpr}
           gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
           camera={{ position: [0, 3.4, 9.2], fov: 34, near: 0.1, far: 260 }}
           onCreated={({ gl, scene }) => {
@@ -66,6 +77,12 @@ export function App() {
             scene.fog = new THREE.Fog('#0a0705', 34, 165)
           }}
         >
+          <PerformanceMonitor
+            factor={1}
+            onChange={({ factor }) =>
+              setDpr(Math.round(Math.max(0.65, 0.65 + factor * (maxDpr - 0.65)) * 20) / 20)
+            }
+          />
           <Backdrop />
           <Studio />
           <Fall />

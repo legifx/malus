@@ -7,6 +7,7 @@ import { orchardVertex, orchardFragment, ORCHARD_DEFAULTS } from '../materials/o
 import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 import { useMalus } from '../store'
+import { useActReady } from '../scroll/useActReady'
 
 /**
  * ACT VI — ORCHARD
@@ -38,7 +39,21 @@ const smoothstep = (a: number, b: number, x: number) => {
 
 const COUNT = { high: 6000, mid: 3000, low: 1200 } as const
 
+/**
+ * Gate and body are separate components on purpose.
+ *
+ * Putting `if (!ready) return null` inside the body would sit AFTER the hooks
+ * that build the geometry, so everything would still be constructed on the
+ * first render and the gate would buy nothing. Only an unmounted subtree
+ * actually skips the work.
+ */
 export function Orchard() {
+  const ready = useActReady(5)
+  if (!ready) return null
+  return <OrchardBody />
+}
+
+function OrchardBody() {
   const root = useRef<THREE.Group>(null)
   const mesh = useRef<THREE.InstancedMesh>(null)
   const shadows = useRef<THREE.InstancedMesh>(null)

@@ -23,7 +23,7 @@ and four gaps.
 - [x] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
 - [x] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
 - [x] 6. Audio. Procedural crunch; the crossmodal effect is half this act's power.
-- [ ] 7. Performance pass + reduced mobile path.
+- [x] 7. Performance pass + reduced mobile path.
 - [ ] 8. Final polish, curated screenshots, README refresh.
 
 ## Rules for the night
@@ -91,3 +91,16 @@ and four gaps.
   Acts publish to a `signals` object rather than knowing the audio engine.
   Verified with tools/audiocheck.mjs: context running, 3 drone oscillators,
   106 noise sources generated across one fracture crossing, no console errors.
+- Performance done, measured with tools/perf.mjs rather than guessed.
+  Against the production build: heap at startup 133 MB -> 17 MB, canvas present
+  in 133 ms, act VI roughly twice as fast.
+  Three changes: identical apple geometries are cached (act IV asked for two and
+  act V a third, all the same 33k triangles) and every full-apple act now shares
+  one subdivision so the cache can actually hit; heavy acts mount one act ahead
+  instead of all building at load; and pixel density adapts under load.
+  One self-inflicted bug found by measuring: gating with `if (!ready) return
+  null` inside the component body sits AFTER the hooks, so the geometry was
+  still built and the gate bought nothing — it needs a separate shell component.
+  A second: a fixed dpr of 1.5 on a 1x display is 2.25x the pixels for no
+  visible gain, and it cost most of the frame rate until anchored to the
+  device's own ratio.

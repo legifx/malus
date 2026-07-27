@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { fbm3 } from '../lib/noise'
+import { useActReady } from '../scroll/useActReady'
 import { scroll } from '../scroll/acts'
 
 /**
@@ -49,7 +50,21 @@ function makeSeedGeometry() {
   return geo
 }
 
+/**
+ * Gate and body are separate components on purpose.
+ *
+ * Putting `if (!ready) return null` inside the body would sit AFTER the hooks
+ * that build the geometry, so everything would still be constructed on the
+ * first render and the gate would buy nothing. Only an unmounted subtree
+ * actually skips the work.
+ */
 export function Seed() {
+  const ready = useActReady(6)
+  if (!ready) return null
+  return <SeedBody />
+}
+
+function SeedBody() {
   const root = useRef<THREE.Group>(null)
   const spin = useRef<THREE.Group>(null)
   const glow = useRef<THREE.Mesh>(null)
