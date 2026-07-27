@@ -17,7 +17,7 @@ site where every act exists reads far better to a judge than two polished acts
 and four gaps.
 
 - [x] 0. Serve the build over the tailnet (systemd user unit `malus.service`)
-- [ ] 1. Act II — SKIN. Macro on the cuticle, ρs/ρd/α driven directly.
+- [x] 1. Act II — SKIN. Macro on the cuticle, ρs/ρd/α driven directly.
 - [ ] 2. Act IV — STAR. Equator cut, five carpels, the pentagram.
 - [ ] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
 - [ ] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
@@ -39,3 +39,10 @@ and four gaps.
 ## Log
 
 - Service up; http 200 on both loopback and the tailnet address.
+- Act II SKIN done. Camera crawls the cuticle while ρs/ρd/α are swept one at a
+  time, then ultraviolet arrives and is absorbed rather than reflected.
+  Two fixes the render forced: at 1.24 units the surface went flat and the
+  frame was a featureless wall of red — no curvature means no travelling
+  highlight, which is the whole act. And procedural detail tuned for a whole
+  fruit vanishes under magnification, so the shader gained a uDetail uniform
+  that scales every frequency at once.

@@ -14,6 +14,11 @@ export interface AppleProps {
   withStem?: boolean
   /** Fires once per geometry with the metrics the acts need for placement. */
   onMetrics?: (m: { restY: number; topY: number }) => void
+  /**
+   * Hands the live uniform object to the caller so an act can drive the skin
+   * per frame. Act II sweeps the three gloss axes with it.
+   */
+  onSkinUniforms?: (u: Record<string, { value: unknown }>) => void
 }
 
 export function Apple({
@@ -24,12 +29,14 @@ export function Apple({
   sunDir = [0.6, 0.35, 0.7],
   withStem = true,
   onMetrics,
+  onSkinUniforms,
 }: AppleProps) {
   const geo = useMemo(() => makeAppleGeometry({ seed, detail, character }), [seed, detail, character])
 
   useEffect(() => {
     onMetrics?.({ restY: geo.userData.restY, topY: geo.userData.topY })
   }, [geo, onMetrics])
+
   const stem = useMemo(() => (withStem ? makeStemGeometry(seed) : null), [seed, withStem])
   const uniforms = useMemo(() => {
     const merged = { ...APPLE_SKIN_DEFAULTS, ...skin, uSeed: (skin?.uSeed ?? seed * 0.137) % 10 }
@@ -40,6 +47,13 @@ export function Apple({
     // Uniform object identity must stay stable or CSM rebuilds the program.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seed])
+
+  // Declared after `uniforms`, not before it: reading the const from an effect
+  // placed above its declaration is a temporal dead zone, not a hoist.
+  useEffect(() => {
+    onSkinUniforms?.(uniforms)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uniforms])
 
   // Where the stem meets the fruit — the floor of the well, not the top of the
   // bounding box, or it floats.

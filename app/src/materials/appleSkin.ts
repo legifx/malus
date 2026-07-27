@@ -57,6 +57,7 @@ export const appleSkinFragment = /* glsl */ `
   uniform float uRusset;      // brown corky texture, mostly in the cavities
   uniform float uWetness;     // 0 = dry, 1 = just washed
   uniform float uBump;          // strength of the surface relief
+  uniform float uDetail;        // multiplies every procedural frequency
   uniform float uTranslucency;  // warm bleed of light through the skin
   uniform float uSeed;
 
@@ -112,7 +113,10 @@ export const appleSkinFragment = /* glsl */ `
 
   void main() {
     vec3 s = normalize(vSphere);
-    vec3 sp = s + vec3(uSeed);
+    // uDetail scales the whole procedural field at once. Act II moves the
+    // camera in close, and detail tuned for a whole fruit becomes invisible
+    // under magnification — the frequencies have to come with it.
+    vec3 sp = (s + vec3(uSeed)) * uDetail;
 
     // --- ground colour -------------------------------------------------------
     // The red of an apple is an anthocyanin blush laid OVER a yellow-green
@@ -254,6 +258,7 @@ export const APPLE_SKIN_DEFAULTS = {
   uRusset: 0.55,
   uWetness: 0.15,
   uBump: 0.006,
+  uDetail: 1.0,
   uTranslucency: 0.55,
   uSeed: 0.0,
 }
