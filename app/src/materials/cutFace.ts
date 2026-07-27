@@ -33,7 +33,10 @@ export const cutFaceFragment = /* glsl */ `
 
   uniform float uRadius;    // outer radius of the cut, in local units
   uniform float uFigure;    // 0..1, how much of the pentagram has been drawn
-  uniform float uBrown;     // 0 = fresh, 1 = fully oxidised (act V borrows this)
+  uniform float uBrown;     // 0 = fresh, 1 = fully oxidised
+  uniform vec2  uDropC;     // where the ascorbic acid landed, in normalised units
+  uniform float uDropR;     // how far it has spread
+  uniform float uDropWet;   // 0..1, how wet that patch still looks
   uniform float uSeed;
   uniform vec3  uFleshPale;
   uniform vec3  uFleshDeep;
@@ -122,9 +125,27 @@ export const cutFaceFragment = /* glsl */ `
     // ---- oxidation ---------------------------------------------------------
     // Act V drives uBrown. Browning starts at the cut and at wounds, so it
     // rides the same grain field the flesh does.
-    float bias = 0.55 + 0.45 * (fbm(vec3(p * 5.5, uSeed + 4.0), 3) * 0.5 + 0.5);
-    float brown = clamp(uBrown * 1.35 - (1.0 - bias) * 0.5, 0.0, 1.0);
+    // Polyphenol oxidase needs a wound and oxygen, so the reaction starts at
+    // the rim and along the damaged vascular tissue and works inward. The noise
+    // field keeps the front irregular — an even wash reads as a colour filter.
+    // Blotchy, not even. Oxidation follows where the cells were damaged, so a
+    // uniform wash reads as a sepia filter laid over the frame rather than as
+    // something happening to the fruit.
+    float bias = 0.30 + 0.70 * (fbm(vec3(p * 7.5, uSeed + 4.0), 4) * 0.5 + 0.5);
+    float front = smoothstep(0.15, 1.05, r) * 0.55 + 0.45;
+    float brown = clamp(uBrown * 1.75 * front - (1.0 - bias) * 0.95, 0.0, 1.0);
+
+    // Ascorbic acid reduces the quinones back before they can polymerise, so
+    // the patch it reaches does not merely stop browning — it goes pale again.
+    float dropD = length(p - uDropC);
+    float drop = 1.0 - smoothstep(uDropR * 0.72, uDropR, dropD);
+    brown *= 1.0 - drop * 0.94;
+
     col = mix(col, mix(vec3(0.478, 0.361, 0.216), vec3(0.278, 0.180, 0.106), brown), brown * 0.9);
+    // The treated patch stays visibly wet at its edge.
+    float meniscus = (1.0 - smoothstep(uDropR * 0.92, uDropR * 1.02, dropD))
+                   * smoothstep(uDropR * 0.78, uDropR * 0.94, dropD);
+    col += vec3(0.24, 0.22, 0.16) * meniscus * uDropWet;
 
     // ---- the figure --------------------------------------------------------
     // Drawn segment by segment, connecting every second carpel tip. Five
@@ -146,7 +167,7 @@ export const cutFaceFragment = /* glsl */ `
     csm_Roughness = clamp(0.62 - 0.22 * carpel + 0.20 * brown, 0.08, 1.0);
     csm_Metalness = 0.0;
     // A cut face is wet. It dulls as it oxidises.
-    csm_Clearcoat = 0.30 * (1.0 - brown);
+    csm_Clearcoat = 0.30 * (1.0 - brown) + drop * uDropWet * 0.45;
     csm_ClearcoatRoughness = 0.42;
     csm_Emissive = vec3(1.0, 0.82, 0.52) * fig * 0.42;
   }
@@ -156,5 +177,7 @@ export const CUT_FACE_DEFAULTS = {
   uRadius: 1.0,
   uFigure: 0,
   uBrown: 0,
+  uDropR: 0,
+  uDropWet: 0,
   uSeed: 0.7,
 }

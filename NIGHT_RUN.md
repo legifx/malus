@@ -19,7 +19,7 @@ and four gaps.
 - [x] 0. Serve the build over the tailnet (systemd user unit `malus.service`)
 - [x] 1. Act II — SKIN. Macro on the cuticle, ρs/ρd/α driven directly.
 - [x] 2. Act IV — STAR. Equator cut, five carpels, the pentagram.
-- [ ] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
+- [x] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
 - [ ] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
 - [ ] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
 - [ ] 6. Audio. Procedural crunch; the crossmodal effect is half this act's power.
@@ -57,3 +57,11 @@ and four gaps.
   Also cut the act's line "People burned for less" — it gestures at witch-trial
   history that is nowhere in the research library. Replaced with the pentagram's
   golden-ratio proportion, which is provable geometry rather than a claim.
+- Act V TIME done. Browning is driven by the same cut-face shader act IV uses;
+  the disc builder moved to geometry/cutDisc.ts so both share it. Ascorbic acid
+  drop falls, spreads, and the patch it reaches goes pale again rather than
+  merely stopping — which is the actual chemistry, not a visual metaphor.
+  Fixes: camera at 2.9 units put a unit-wide disc across 38° of a 34° field and
+  it spilled out on all sides; and the first browning pass was an even wash that
+  read as a sepia filter over the frame rather than something happening to the
+  fruit, so the front is now strongly blotched by the damage field.
