@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { Studio } from './components/Studio'
 import { Backdrop } from './components/Backdrop'
 import { Fall } from './acts/Fall'
+import { Bite } from './acts/Bite'
 import { Overlay } from './ui/Overlay'
 import { ScrollDriver } from './scroll/ScrollDriver'
 import { useMalus, detectQuality } from './store'
@@ -60,6 +61,7 @@ export function App() {
           <Backdrop />
           <Studio />
           <Fall />
+          <Bite />
           <Effects />
         </Canvas>
       </div>

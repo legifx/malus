@@ -51,7 +51,17 @@ export function Overlay() {
       if (marker.current) marker.current.style.opacity = progress > 0.012 ? '0.9' : '0'
 
       // Scroll invitation: dies at the first touch and never returns.
-      if (invite.current) invite.current.style.opacity = progress < 0.006 ? '0.85' : '0'
+      // Removed from the layout rather than merely faded — opacity alone left
+      // it faintly visible deep into the piece whenever the frame loop stalled
+      // mid-transition, and law 5 does not tolerate a stray word on screen.
+      if (invite.current) {
+        if (progress > 0.006) {
+          invite.current.style.opacity = '0'
+          invite.current.style.display = 'none'
+        } else {
+          invite.current.style.opacity = '0.85'
+        }
+      }
 
       // The wordmark belongs to the impact and to nothing else.
       if (wordmark.current) {
