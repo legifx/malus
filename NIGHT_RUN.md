@@ -18,7 +18,7 @@ and four gaps.
 
 - [x] 0. Serve the build over the tailnet (systemd user unit `malus.service`)
 - [x] 1. Act II — SKIN. Macro on the cuticle, ρs/ρd/α driven directly.
-- [ ] 2. Act IV — STAR. Equator cut, five carpels, the pentagram.
+- [x] 2. Act IV — STAR. Equator cut, five carpels, the pentagram.
 - [ ] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
 - [ ] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
 - [ ] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
@@ -46,3 +46,14 @@ and four gaps.
   highlight, which is the whole act. And procedural detail tuned for a whole
   fruit vanishes under magnification, so the shader gained a uDetail uniform
   that scales every frequency at once.
+- Act IV STAR done. Cut with clipping planes rather than by rebuilding the mesh;
+  the cap disc follows the fruit's real cross-section (a plain circle overhangs
+  the skin, because the section is five-lobed and noisy). Fixes the render
+  forced: lifting the top half straight up parked it between an overhead camera
+  and the very face it was meant to reveal — it is set ASIDE instead, which also
+  gives the composition everyone already knows. Camera was at 3.5 units where a
+  single apple already spanned 31° of a 34° field. Carpels and the vascular ring
+  were both too faint to see at all on the first pass.
+  Also cut the act's line "People burned for less" — it gestures at witch-trial
+  history that is nowhere in the research library. Replaced with the pentagram's
+  golden-ratio proportion, which is provable geometry rather than a claim.

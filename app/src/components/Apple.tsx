@@ -19,6 +19,8 @@ export interface AppleProps {
    * per frame. Act II sweeps the three gloss axes with it.
    */
   onSkinUniforms?: (u: Record<string, { value: unknown }>) => void
+  /** World-space clipping planes. Act IV cuts the fruit at the equator. */
+  clippingPlanes?: THREE.Plane[]
 }
 
 export function Apple({
@@ -30,6 +32,7 @@ export function Apple({
   withStem = true,
   onMetrics,
   onSkinUniforms,
+  clippingPlanes,
 }: AppleProps) {
   const geo = useMemo(() => makeAppleGeometry({ seed, detail, character }), [seed, detail, character])
 
@@ -88,6 +91,7 @@ export function Apple({
           sheenColor={new THREE.Color('#ff6a4d')}
           envMapIntensity={1.15}
           clearcoat={1}
+          clippingPlanes={clippingPlanes}
         />
       </mesh>
 

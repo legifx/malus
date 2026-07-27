@@ -7,6 +7,7 @@ import { Backdrop } from './components/Backdrop'
 import { Fall } from './acts/Fall'
 import { Bite } from './acts/Bite'
 import { Skin } from './acts/Skin'
+import { Star } from './acts/Star'
 import { Overlay } from './ui/Overlay'
 import { ScrollDriver } from './scroll/ScrollDriver'
 import { useMalus, detectQuality } from './store'
@@ -51,6 +52,9 @@ export function App() {
           gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
           camera={{ position: [0, 3.4, 9.2], fov: 34, near: 0.1, far: 260 }}
           onCreated={({ gl, scene }) => {
+            // Act IV cuts the fruit with clipping planes rather than by
+            // rebuilding the mesh, which needs local clipping switched on.
+            gl.localClippingEnabled = true
             gl.toneMapping = THREE.ACESFilmicToneMapping
             gl.toneMappingExposure = 1.16
             // Background comes from Backdrop, not a flat clear colour.
@@ -64,6 +68,7 @@ export function App() {
           <Fall />
           <Skin />
           <Bite />
+          <Star />
           <Effects />
         </Canvas>
       </div>

@@ -50,7 +50,10 @@ export const ACTS: ActDef[] = [
     id: 'star',
     numeral: 'IV',
     title: 'STAR',
-    line: 'Cut it across the middle and five chambers make a star. People burned for less.',
+    // "People burned for less" was cut: it gestures at witch-trial history that
+    // is nowhere in the research library. The pentagram's proportions are not a
+    // claim about the world — they are provable geometry.
+    line: 'Cut it across the middle. Five carpels make a star, and that star is built on the golden ratio.',
     question: 'What happens if we leave it open?',
     vh: 3.5,
   },
