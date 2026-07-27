@@ -9,6 +9,7 @@ import { Bite } from './acts/Bite'
 import { Skin } from './acts/Skin'
 import { Star } from './acts/Star'
 import { Time } from './acts/Time'
+import { Orchard } from './acts/Orchard'
 import { Overlay } from './ui/Overlay'
 import { ScrollDriver } from './scroll/ScrollDriver'
 import { useMalus, detectQuality } from './store'
@@ -71,6 +72,7 @@ export function App() {
           <Bite />
           <Star />
           <Time />
+          <Orchard />
           <Effects />
         </Canvas>
       </div>

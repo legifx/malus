@@ -20,7 +20,7 @@ and four gaps.
 - [x] 1. Act II — SKIN. Macro on the cuticle, ρs/ρd/α driven directly.
 - [x] 2. Act IV — STAR. Equator cut, five carpels, the pentagram.
 - [x] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
-- [ ] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
+- [x] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
 - [ ] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
 - [ ] 6. Audio. Procedural crunch; the crossmodal effect is half this act's power.
 - [ ] 7. Performance pass + reduced mobile path.
@@ -65,3 +65,13 @@ and four gaps.
   it spilled out on all sides; and the first browning pass was an even wash that
   read as a sepia filter over the frame rather than something happening to the
   fruit, so the front is now strongly blotched by the damage field.
+- Act VI ORCHARD done. Instanced field planted in rows, 1200/3000/6000 by tier,
+  every fruit's ground colour, blush wrap, striping, ripeness and lopsidedness
+  derived from its own seed — a thousand tinted copies would argue the opposite
+  of what the act says. Camera rises from among the fruit to above it: the
+  vastness is the scale jump, not a big room. Second half goes out fruit by
+  fruit, a few never do. No lost-cultivar number on screen (BRIEF §6).
+  Fixes: without contact shadows the apples read as spheres floating in the
+  dark, so each gets a painted ellipse — a real shadow cascade over a field this
+  wide costs far more than it returns. And azimuth-based striping aliases into
+  speckle near the poles, so it is lower frequency now and fades out there.
