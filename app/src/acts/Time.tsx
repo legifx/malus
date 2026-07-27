@@ -5,7 +5,7 @@ import CustomShaderMaterial from 'three-custom-shader-material'
 import { Apple } from '../components/Apple'
 import { makeCutDisc, CUT_AT } from '../geometry/cutDisc'
 import { cutFaceVertex, cutFaceFragment, CUT_FACE_DEFAULTS } from '../materials/cutFace'
-import { scroll } from '../scroll/acts'
+import { scroll, signals } from '../scroll/acts'
 
 /**
  * ACT V — TIME
@@ -71,6 +71,7 @@ export function Time() {
     const fall = clamp01((t - (DROP_AT - 0.10)) / 0.10)
     const spread = smoothstep(DROP_AT, 0.84, t)
     capUniforms.uDropR.value = spread * 0.62
+    signals.drop = spread
     capUniforms.uDropWet.value = (1 - smoothstep(0.86, 1.0, t)) * smoothstep(DROP_AT - 0.02, DROP_AT + 0.05, t)
 
     if (drop.current) {

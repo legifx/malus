@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import CustomShaderMaterial from 'three-custom-shader-material'
 import { makeAppleGeometry } from '../geometry/apple'
 import { orchardVertex, orchardFragment, ORCHARD_DEFAULTS } from '../materials/orchard'
-import { scroll } from '../scroll/acts'
+import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 import { useMalus } from '../store'
 
@@ -134,7 +134,9 @@ export function Orchard() {
     camera.position.set(0, y, z)
     camera.lookAt(0, rise * 1.2, z - 9.0 - rise * 16.0)
 
-    uniforms.uDark.value = smoothstep(0.58, 0.96, t)
+    const dark = smoothstep(0.58, 0.96, t)
+    uniforms.uDark.value = dark
+    signals.dark = dark
   })
 
   return (

@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ACTS, scroll } from '../scroll/acts'
+import { enableAudio, disableAudio, audioSupported } from '../audio/engine'
 import './overlay.css'
 
 /**
@@ -23,6 +24,15 @@ const window4 = (t: number, a: number, b: number, c: number, d: number) =>
 const IMPACT_AT = 0.66
 
 export function Overlay() {
+  const [sound, setSound] = useState(false)
+
+  const toggleSound = async () => {
+    // The click IS the gesture the browser is waiting for, which is why this
+    // cannot be done automatically on scroll.
+    if (sound) { disableAudio(); setSound(false) }
+    else { const ok = await enableAudio(); setSound(ok) }
+  }
+
   const marker = useRef<HTMLDivElement>(null)
   const numeral = useRef<HTMLSpanElement>(null)
   const title = useRef<HTMLSpanElement>(null)
@@ -108,6 +118,19 @@ export function Overlay() {
       <p className="line" ref={line} />
       <p className="question" ref={question} />
       <div className="invite" ref={invite}>scroll</div>
+
+      {audioSupported() && (
+        <button
+          className="sound"
+          data-on={sound}
+          onClick={toggleSound}
+          aria-pressed={sound}
+          aria-label={sound ? 'Turn sound off' : 'Turn sound on'}
+        >
+          <span className="bars" aria-hidden><i /><i /><i /></span>
+          <span>{sound ? 'sound on' : 'sound'}</span>
+        </button>
+      )}
     </div>
   )
 }

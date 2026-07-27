@@ -143,3 +143,49 @@
 @media (prefers-reduced-motion: reduce) {
   .invite::after { animation: none; opacity: 0.6; }
 }
+
+/* The only control in the piece.
+   Browsers will not start audio without a gesture, so it cannot simply fade in
+   on scroll — and law 5 says nothing may pull the reader out of the experience,
+   so it is one glyph, low contrast, in a corner, and it never moves. */
+.sound {
+  position: absolute;
+  right: clamp(1.25rem, 3vw, 3rem);
+  bottom: clamp(1.25rem, 3vh, 2.5rem);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.2rem;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: clamp(0.55rem, 0.72vw, 0.68rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  opacity: 0.55;
+  transition: opacity 0.4s ease, color 0.4s ease;
+}
+.sound:hover,
+.sound:focus-visible {
+  opacity: 1;
+  color: var(--ink);
+}
+.sound .bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 0.72rem;
+}
+.sound .bars i {
+  width: 2px;
+  background: currentColor;
+  height: 30%;
+  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sound[data-on="true"] .bars i:nth-child(1) { height: 55%; }
+.sound[data-on="true"] .bars i:nth-child(2) { height: 100%; }
+.sound[data-on="true"] .bars i:nth-child(3) { height: 72%; }
+.sound[data-on="true"] { color: var(--ink); opacity: 0.9; }

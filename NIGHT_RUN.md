@@ -22,7 +22,7 @@ and four gaps.
 - [x] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
 - [x] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
 - [x] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
-- [ ] 6. Audio. Procedural crunch; the crossmodal effect is half this act's power.
+- [x] 6. Audio. Procedural crunch; the crossmodal effect is half this act's power.
 - [ ] 7. Performance pass + reduced mobile path.
 - [ ] 8. Final polish, curated screenshots, README refresh.
 
@@ -82,3 +82,12 @@ and four gaps.
   solid brown; and a 0.02 wrinkle displacement was enough to make the
   icosahedron's subdivision show through as a diagonal weave.
   ALL SEVEN ACTS NOW EXIST. Remaining: audio, performance, polish.
+- Audio done. Granular crunch: a real bite is not one event but a burst of cell
+  walls rupturing, so it is synthesised as a cloud of micro-impulses. Turgor
+  moves centre frequency, attack time, decay length and grain density together
+  along one perceptual axis rather than just filtering a fixed sound — law 4.
+  Drone bed follows the same ripeness arc as the colour. Triggers fire on
+  CROSSINGS so scrolling back up through the fracture crunches too.
+  Acts publish to a `signals` object rather than knowing the audio engine.
+  Verified with tools/audiocheck.mjs: context running, 3 drone oscillators,
+  106 noise sources generated across one fracture crossing, no console errors.

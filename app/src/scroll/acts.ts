@@ -121,3 +121,24 @@ export const scroll = {
   /** Signed, in progress-units per second. Drives motion blur and audio. */
   velocity: 0,
 }
+
+/**
+ * What the acts are currently doing, for anything that needs to react without
+ * knowing which act it is watching.
+ *
+ * Same reasoning as `scroll`: a plain mutable object, written by acts in
+ * useFrame and read by the audio engine in its own loop. Routing this through
+ * React state would re-render the tree for every frame of a fracture.
+ */
+export const signals = {
+  /** Act I — 0 before contact, rising after it. */
+  impact: 0,
+  /** Act III — 0 whole, 1 fully apart. */
+  burst: 0,
+  /** Act III — 1 crisp, 0 mealy. */
+  turgor: 1,
+  /** Act V — how far the drop has spread. */
+  drop: 0,
+  /** Act VI — how much of the orchard has gone out. */
+  dark: 0,
+}

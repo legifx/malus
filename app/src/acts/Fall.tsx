@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, useCallback } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { Apple } from '../components/Apple'
-import { scroll } from '../scroll/acts'
+import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
 /**
@@ -149,6 +149,7 @@ export function Fall() {
     shockUniforms.uRadius.value = Math.pow(after, 0.55)
     if (shock.current) shock.current.visible = after > 0.001
 
+    signals.impact = after
     dustUniforms.uT.value = after
     if (dust.current) dust.current.visible = after > 0.001
   })

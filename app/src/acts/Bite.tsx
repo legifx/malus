@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import CustomShaderMaterial from 'three-custom-shader-material'
 import { makeFracturedApple } from '../geometry/fracture'
 import { appleBurstVertex, appleBurstFragment, APPLE_BURST_DEFAULTS } from '../materials/appleBurst'
-import { scroll } from '../scroll/acts'
+import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
 /**
@@ -112,6 +112,8 @@ export function Bite() {
 
     uniforms.uBurst.value = burst
     uniforms.uTurgor.value = turgor
+    signals.burst = burst
+    signals.turgor = turgor
 
     // Juice belongs to the crisp break alone.
     juiceUniforms.uT.value = t < REPAIR_END ? Math.pow(ramp(t, HOLD_END, CRISP_END), 0.6) : 0
