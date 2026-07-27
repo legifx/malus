@@ -86,14 +86,16 @@ export function Overlay() {
         // Act I holds its line back until after the landing; the other acts
         // let it arrive in the middle.
         const a = index === 0
-          ? window4(t, IMPACT_AT + 0.16, IMPACT_AT + 0.26, 0.92, 1.0)
-          : window4(t, 0.30, 0.42, 0.80, 0.92)
+          ? window4(t, IMPACT_AT + 0.16, IMPACT_AT + 0.26, 0.80, 0.865)
+          // Out well before the question arrives. These two used to overlap
+          // between 0.88 and 0.92 and printed on top of each other.
+          : window4(t, 0.30, 0.42, 0.78, 0.865)
         line.current.style.opacity = String(a)
         line.current.style.transform = `translateX(-50%) translateY(${(1 - a) * 16}px)`
       }
 
       if (question.current) {
-        const a = act.question ? window4(t, 0.88, 0.95, 0.985, 1.0) : 0
+        const a = act.question ? window4(t, 0.895, 0.95, 0.985, 1.0) : 0
         question.current.style.opacity = String(a * 0.8)
       }
 

@@ -24,7 +24,7 @@ and four gaps.
 - [x] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
 - [x] 6. Audio. Procedural crunch; the crossmodal effect is half this act's power.
 - [x] 7. Performance pass + reduced mobile path.
-- [ ] 8. Final polish, curated screenshots, README refresh.
+- [x] 8. Final polish, curated screenshots, README refresh.
 
 ## Rules for the night
 
@@ -104,3 +104,15 @@ and four gaps.
   A second: a fixed dpr of 1.5 on a 1x display is 2.25x the pixels for no
   visible gain, and it cost most of the frame rate until anchored to the
   device's own ratio.
+- Polish done. Full sweep over all ten frames in one session: every act reached
+  its expected state and there were NO console errors anywhere in the piece.
+  One real defect found by it — the act line and the closing question had
+  overlapping fade windows between 0.88 and 0.92 and printed on top of each
+  other. Separated.
+  Nine curated screenshots in screenshots/, README rewritten for the finished
+  piece with the measured performance table and the provenance section.
+
+## Night run complete
+
+All eight steps done. Seven acts, audio, performance, polish. Live on
+a private network address and rebuilt after every step.
