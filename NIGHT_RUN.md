@@ -21,7 +21,7 @@ and four gaps.
 - [x] 2. Act IV — STAR. Equator cut, five carpels, the pentagram.
 - [x] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
 - [x] 4. Act VI — ORCHARD. Instanced apples, each genetically distinct, then dark.
-- [ ] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
+- [x] 5. Act VII — SEED. Collapse back to one point. Closes the loop.
 - [ ] 6. Audio. Procedural crunch; the crossmodal effect is half this act's power.
 - [ ] 7. Performance pass + reduced mobile path.
 - [ ] 8. Final polish, curated screenshots, README refresh.
@@ -75,3 +75,10 @@ and four gaps.
   dark, so each gets a painted ellipse — a real shadow cascade over a field this
   wide costs far more than it returns. And azimuth-based striping aliases into
   speckle near the poles, so it is lower frequency now and fades out there.
+- Act VII SEED done. The loop closes: the piece opened on a point of light that
+  turned out to be a falling apple and ends on a point of light that turns out
+  to be a pip, with the camera retreating instead of the fruit approaching.
+  Fixes: the camera started 0.18 outside the pip's own surface and the frame was
+  solid brown; and a 0.02 wrinkle displacement was enough to make the
+  icosahedron's subdivision show through as a diagonal weave.
+  ALL SEVEN ACTS NOW EXIST. Remaining: audio, performance, polish.

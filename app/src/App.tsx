@@ -10,6 +10,7 @@ import { Skin } from './acts/Skin'
 import { Star } from './acts/Star'
 import { Time } from './acts/Time'
 import { Orchard } from './acts/Orchard'
+import { Seed } from './acts/Seed'
 import { Overlay } from './ui/Overlay'
 import { ScrollDriver } from './scroll/ScrollDriver'
 import { useMalus, detectQuality } from './store'
@@ -73,6 +74,7 @@ export function App() {
           <Star />
           <Time />
           <Orchard />
+          <Seed />
           <Effects />
         </Canvas>
       </div>
