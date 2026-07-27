@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Working captures from the headless render loop. Hundreds of iterations of
+# "does this actually look right yet" — not source. The curated set for the
+# submission lives in screenshots/.
+app/shots/
+
+# The local research library: 228 papers and 66 repo READMEs fetched from
+# arXiv, OpenAlex and GitHub. Third-party text under a patchwork of licences,
+# so it is deliberately NOT redistributed here. BRIEF.md is the synthesis and
+# is ours; it cites every source by DOI and local path.
+research/
+*.tsbuildinfo

@@ -1,0 +1,145 @@
+:root {
+  --ink: #f4e9dd;
+  --ink-dim: #a08d7e;
+  --accent: #e2452c;
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+    Georgia, ui-serif, serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  color: var(--ink);
+}
+
+/* Act marker, top left. Small, quiet, always there — the only persistent
+   chrome in the piece. */
+.marker {
+  position: absolute;
+  top: clamp(1.25rem, 3vh, 2.5rem);
+  left: clamp(1.25rem, 3vw, 3rem);
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  font-family: var(--mono);
+  font-size: clamp(0.62rem, 0.78vw, 0.78rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.marker .numeral {
+  color: var(--accent);
+}
+
+/* The wordmark. Appears once, at the impact. */
+.wordmark {
+  position: absolute;
+  left: 50%;
+  /* Below the landed fruit, not across it. The apple owns the upper half of
+     the frame at the moment of impact; the title arrives underneath it. */
+  top: 74%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.wordmark h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(3.4rem, 15vw, 13rem);
+  letter-spacing: 0.14em;
+  line-height: 0.92;
+  text-indent: 0.14em; /* balance the trailing letter-space */
+  color: var(--ink);
+}
+.wordmark p {
+  margin: clamp(0.6rem, 1.6vh, 1.4rem) 0 0;
+  font-family: var(--mono);
+  font-size: clamp(0.6rem, 0.85vw, 0.8rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  text-indent: 0.42em;
+}
+
+/* The one sentence per act. Law 2 of the brief: exactly one. */
+.line {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(3.2rem, 9vh, 5rem);
+  transform: translateX(-50%);
+  width: min(46ch, 82vw);
+  margin: 0;
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 2.3vw, 2.05rem);
+  line-height: 1.34;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* The open question the act closes on. Law 7. */
+.question {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(2rem, 6vh, 3.4rem);
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--mono);
+  font-size: clamp(0.6rem, 0.8vw, 0.74rem);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  opacity: 0;
+  white-space: nowrap;
+}
+
+/* Scroll invitation. Shown once, killed forever on first scroll. */
+.invite {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(2.2rem, 7vh, 4rem);
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  text-indent: 0.4em;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.invite::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 3.2rem;
+  margin: 1rem auto 0;
+  background: linear-gradient(to bottom, var(--ink-dim), transparent);
+  transform-origin: top;
+  animation: drop 2.6s cubic-bezier(0.5, 0, 0.75, 0) infinite;
+}
+@keyframes drop {
+  0% { transform: scaleY(0); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invite::after { animation: none; opacity: 0.6; }
+}
