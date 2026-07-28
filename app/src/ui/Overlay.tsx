@@ -79,6 +79,7 @@ export function Overlay() {
     let frame = 0
     let shownAct = -1
     let curtain = 1
+    let lastT = performance.now()
 
     const loop = () => {
       const { index, t, progress } = scroll
@@ -163,8 +164,15 @@ export function Overlay() {
         let dip = smooth(1 - clamp01(edge / DISSOLVE_BAND))
         if (progress < 0.004 || progress > 0.997) dip = 0
 
+        // Eased against the CLOCK, not against the frame count. At 0.055 per
+        // frame this took about a hundred frames to clear, which is a third of
+        // a second at 300fps and over a minute on a slow renderer — the piece
+        // sat behind a half-closed curtain and looked unlit.
+        const now = performance.now()
+        const dt = Math.min(0.1, (now - lastT) / 1000)
+        lastT = now
         const want = signals.ready ? 0 : 1
-        curtain += (want - curtain) * 0.055
+        curtain += (want - curtain) * (1 - Math.exp(-dt / 0.28))
         if (curtain < 0.004) curtain = 0
 
         dissolve.current.style.opacity = Math.max(curtain, dip * 0.82).toFixed(3)
