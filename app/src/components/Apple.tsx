@@ -91,7 +91,7 @@ export function Apple({
           sheenColor={new THREE.Color('#ff6a4d')}
           envMapIntensity={1.15}
           clearcoat={1}
-          clippingPlanes={clippingPlanes}
+          clippingPlanes={clippingPlanes ?? null}
         />
       </mesh>
 

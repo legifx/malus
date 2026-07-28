@@ -12,7 +12,14 @@ import { Environment, Lightformer } from '@react-three/drei'
 export function Studio({ intensity = 1 }: { intensity?: number }) {
   return (
     <>
-      <Environment resolution={512} frames={1}>
+      {/* Two captures, not one and not twelve.
+          One was not enough: whichever frame came first sometimes landed before
+          the lightformers were in place, and the environment came out black —
+          the whole scene then rendered about five times too dark for the first
+          second. Twelve made the warm-up itself the problem, since every
+          capture renders six cube faces. Two costs almost nothing, and the
+          curtain in the overlay covers the frames it takes. */}
+      <Environment resolution={512} frames={2}>
         {/* Key — softbox. Kept modest and far: a big near rect reflects as a
             recognisable bright rectangle in the wax, which reads as CG. */}
         <Lightformer

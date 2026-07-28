@@ -1,9 +1,10 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import CustomShaderMaterial from 'three-custom-shader-material'
 import { makeAppleGeometry } from '../geometry/apple'
 import { orchardVertex, orchardFragment, ORCHARD_DEFAULTS } from '../materials/orchard'
+import { setPose } from '../scene/CameraRig'
 import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 import { useMalus } from '../store'
@@ -57,7 +58,6 @@ function OrchardBody() {
   const root = useRef<THREE.Group>(null)
   const mesh = useRef<THREE.InstancedMesh>(null)
   const shadows = useRef<THREE.InstancedMesh>(null)
-  const camera = useThree((s) => s.camera)
   const quality = useMalus((s) => s.quality)
   const count = COUNT[quality]
 
@@ -146,8 +146,7 @@ function OrchardBody() {
     const rise = smoothstep(0.16, 0.62, t)
     const y = 0.65 + rise * 21.0
     const z = 5.0 - t * 5.5 + rise * 10.0
-    camera.position.set(0, y, z)
-    camera.lookAt(0, rise * 1.2, z - 9.0 - rise * 16.0)
+    setPose(0, y, z, 0, rise * 1.2, z - 9.0 - rise * 16.0)
 
     const dark = smoothstep(0.58, 0.96, t)
     uniforms.uDark.value = dark

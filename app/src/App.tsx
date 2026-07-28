@@ -12,6 +12,8 @@ import { Star } from './acts/Star'
 import { Time } from './acts/Time'
 import { Orchard } from './acts/Orchard'
 import { Seed } from './acts/Seed'
+import { CameraRig } from './scene/CameraRig'
+import { Projector } from './scene/Projector'
 import { Overlay } from './ui/Overlay'
 import { ScrollDriver } from './scroll/ScrollDriver'
 import { useMalus, detectQuality } from './store'
@@ -63,14 +65,24 @@ export function App() {
         <Canvas
           shadows
           dpr={dpr}
-          gl={{ antialias: false, alpha: false, powerPreference: 'high-performance' }}
+          gl={{
+            antialias: false,
+            alpha: false,
+            powerPreference: 'high-performance',
+            // ?readback=1 lets tools/pixels.mjs read the framebuffer back. Off
+            // by default because it costs real performance.
+            preserveDrawingBuffer: new URLSearchParams(location.search).has('readback'),
+          }}
           camera={{ position: [0, 3.4, 9.2], fov: 34, near: 0.1, far: 260 }}
           onCreated={({ gl, scene }) => {
             // Act IV cuts the fruit with clipping planes rather than by
             // rebuilding the mesh, which needs local clipping switched on.
             gl.localClippingEnabled = true
             gl.toneMapping = THREE.ACESFilmicToneMapping
-            gl.toneMappingExposure = 1.16
+            // ?exposure=N overrides the grade. Diagnostic: it separates "not
+            // drawn" from "drawn but too dark", which a screenshot alone cannot.
+            const q = new URLSearchParams(location.search).get('exposure')
+            gl.toneMappingExposure = q ? Number(q) : 1.16
             // Background comes from Backdrop, not a flat clear colour.
             // Depth for the long fall: the apple emerges out of the dark
             // rather than simply being small at the start.
@@ -92,6 +104,8 @@ export function App() {
           <Time />
           <Orchard />
           <Seed />
+          <CameraRig />
+          <Projector />
           <Effects />
         </Canvas>
       </div>

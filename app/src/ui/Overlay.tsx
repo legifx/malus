@@ -1,27 +1,57 @@
 import { useEffect, useRef, useState } from 'react'
-import { ACTS, scroll } from '../scroll/acts'
+import { ACTS, scroll, signals } from '../scroll/acts'
 import { enableAudio, disableAudio, audioSupported } from '../audio/engine'
+import { Annotations } from './Annotations'
 import './overlay.css'
 
 /**
- * Typography layer.
+ * Typography and the 2D layer.
  *
- * Driven by the same scroll clock as the scene, and written straight to the DOM
- * from a rAF loop. Putting scroll into React state here would re-render the
- * tree every frame for the sake of two opacity values.
+ * Driven by the same scroll clock as the scene and written straight to the DOM
+ * from a rAF loop — putting scroll into React state would re-render the tree
+ * every frame for the sake of a handful of opacities.
  *
- * Rules being enforced, from BRIEF.md:
- *   law 2 — exactly one world-model-correcting sentence per act
- *   law 5 — nothing that breaks absorption: no chrome, no counters, no controls
- *   law 7 — every act ends on an open question
+ * From BRIEF.md:
+ *   law 2 — one world-model-correcting sentence per act. That caps the
+ *           HEADLINE, not the act: the detail paragraph carries the substance
+ *           underneath it, set small so it reads as annotation.
+ *   law 5 — nothing that breaks absorption. One control, in a corner.
+ *   law 7 — every act ends on an open question.
  */
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
+const smooth = (x: number) => x * x * (3 - 2 * x)
 /** Fade in over [a,b], hold, fade out over [c,d]. */
 const window4 = (t: number, a: number, b: number, c: number, d: number) =>
-  clamp01((t - a) / (b - a)) * (1 - clamp01((t - c) / (d - c)))
+  smooth(clamp01((t - a) / (b - a))) * (1 - smooth(clamp01((t - c) / (d - c))))
 
-const IMPACT_AT = 0.66
+const IMPACT_AT = 0.52
+
+/**
+ * Act I carries the wordmark as well, so its copy runs on its own schedule:
+ * nothing may appear until the fruit has actually landed.
+ */
+type Win = readonly [number, number, number, number]
+
+function windowsFor(index: number): { line: Win; detail: Win; question: Win } {
+  if (index === 0) {
+    return {
+      // Strictly sequential. The first pass had all three on screen at once,
+      // with the copy printed straight through the middle of the wordmark.
+      line: [0.70, 0.76, 0.865, 0.90] as const,
+      detail: [0.76, 0.82, 0.865, 0.90] as const,
+      question: [0.925, 0.955, 0.99, 1.0] as const,
+    }
+  }
+  return {
+    line: [0.22, 0.34, 0.78, 0.865] as const,
+    detail: [0.34, 0.46, 0.78, 0.865] as const,
+    question: [0.90, 0.95, 0.985, 1.0] as const,
+  }
+}
+
+/** How close to an act boundary the dissolve begins, in act-local time. */
+const DISSOLVE_BAND = 0.038
 
 export function Overlay() {
   const [sound, setSound] = useState(false)
@@ -33,37 +63,50 @@ export function Overlay() {
     else { const ok = await enableAudio(); setSound(ok) }
   }
 
+  const root = useRef<HTMLDivElement>(null)
   const marker = useRef<HTMLDivElement>(null)
   const numeral = useRef<HTMLSpanElement>(null)
   const title = useRef<HTMLSpanElement>(null)
   const wordmark = useRef<HTMLDivElement>(null)
   const line = useRef<HTMLParagraphElement>(null)
+  const detail = useRef<HTMLParagraphElement>(null)
   const question = useRef<HTMLParagraphElement>(null)
   const invite = useRef<HTMLDivElement>(null)
+  const rail = useRef<HTMLDivElement>(null)
+  const dissolve = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let frame = 0
     let shownAct = -1
+    let curtain = 1
 
     const loop = () => {
       const { index, t, progress } = scroll
       const act = ACTS[index]
+      const w = windowsFor(index)
 
       if (index !== shownAct) {
         if (numeral.current) numeral.current.textContent = act.numeral
         if (title.current) title.current.textContent = act.title
         if (line.current) line.current.textContent = act.line
+        if (detail.current) detail.current.textContent = act.detail
         if (question.current) question.current.textContent = act.question
+        if (rail.current) {
+          const ticks = rail.current.children
+          for (let i = 0; i < ticks.length; i++) {
+            ;(ticks[i] as HTMLElement).dataset.on = String(i === index)
+          }
+        }
         shownAct = index
       }
 
-      // Act marker fades in once the piece has actually begun.
-      if (marker.current) marker.current.style.opacity = progress > 0.012 ? '0.9' : '0'
+      const started = progress > 0.012
+      if (marker.current) marker.current.style.opacity = started ? '0.9' : '0'
+      if (rail.current) rail.current.style.opacity = started ? '1' : '0'
 
-      // Scroll invitation: dies at the first touch and never returns.
-      // Removed from the layout rather than merely faded — opacity alone left
-      // it faintly visible deep into the piece whenever the frame loop stalled
-      // mid-transition, and law 5 does not tolerate a stray word on screen.
+      // Scroll invitation: dies at the first touch and never returns. Removed
+      // from layout rather than faded, or a stalled frame loop can leave it
+      // faintly on screen deep into the piece.
       if (invite.current) {
         if (progress > 0.006) {
           invite.current.style.opacity = '0'
@@ -73,30 +116,58 @@ export function Overlay() {
         }
       }
 
-      // The wordmark belongs to the impact and to nothing else.
+      // The wordmark hands over to the copy rather than sitting behind it.
+      const aWord = index === 0 ? window4(t, IMPACT_AT + 0.01, IMPACT_AT + 0.07, 0.65, 0.71) : 0
       if (wordmark.current) {
-        const a = index === 0 ? window4(t, IMPACT_AT + 0.01, IMPACT_AT + 0.09, 0.9, 1.0) : 0
-        wordmark.current.style.opacity = String(a)
-        // Settles downward as it appears — it arrives with the apple.
-        const drop = (1 - a) * 26
-        wordmark.current.style.transform = `translate(-50%, calc(-50% - ${drop}px))`
+        wordmark.current.style.opacity = String(aWord)
+        wordmark.current.style.transform =
+          `translate(-50%, calc(-50% - ${(1 - aWord) * 26}px))`
       }
 
+      const aLine = window4(t, ...w.line)
       if (line.current) {
-        // Act I holds its line back until after the landing; the other acts
-        // let it arrive in the middle.
-        const a = index === 0
-          ? window4(t, IMPACT_AT + 0.16, IMPACT_AT + 0.26, 0.80, 0.865)
-          // Out well before the question arrives. These two used to overlap
-          // between 0.88 and 0.92 and printed on top of each other.
-          : window4(t, 0.30, 0.42, 0.78, 0.865)
-        line.current.style.opacity = String(a)
-        line.current.style.transform = `translateX(-50%) translateY(${(1 - a) * 16}px)`
+        line.current.style.opacity = String(aLine)
+        line.current.style.transform = `translateY(${(1 - aLine) * 14}px)`
       }
 
-      if (question.current) {
-        const a = act.question ? window4(t, 0.895, 0.95, 0.985, 1.0) : 0
-        question.current.style.opacity = String(a * 0.8)
+      const aDetail = window4(t, ...w.detail)
+      if (detail.current) detail.current.style.opacity = String(aDetail * 0.98)
+
+      const aQ = act.question ? window4(t, ...w.question) : 0
+      if (question.current) question.current.style.opacity = String(aQ * 0.85)
+
+      // The scrim exists only to hold type. With nothing on screen it would
+      // just be a permanent dark band across the bottom of the frame.
+      if (root.current) {
+        const need = Math.max(aLine, aDetail, aQ * 0.7, aWord * 0.8)
+        root.current.style.setProperty('--scrim', (0.12 + need * 0.88).toFixed(3))
+      }
+
+      // The dissolve.
+      //
+      // At an act boundary the 3D subject genuinely changes — a different mesh
+      // in a different place. The camera rig removes the jump, but the swap
+      // itself is still a cut, so it is treated as one: a short dip, which
+      // reads as an edit rather than as a glitch. Suppressed at the very start
+      // and very end, where there is no neighbour to cut to.
+      //
+      // The same element is also the opening curtain. The environment map needs
+      // a few real frames before anything in the scene is lit, and on a slow
+      // machine that is long enough to see as a dark, wrong-looking first
+      // second. So the piece starts behind black and the curtain lifts on
+      // evidence — the renderer reporting it has produced frames — rather than
+      // on a guessed delay. Eased in JS, not CSS: the opacity is rewritten
+      // every frame, and a transition would fight it.
+      if (dissolve.current) {
+        const edge = Math.min(t, 1 - t)
+        let dip = smooth(1 - clamp01(edge / DISSOLVE_BAND))
+        if (progress < 0.004 || progress > 0.997) dip = 0
+
+        const want = signals.ready ? 0 : 1
+        curtain += (want - curtain) * 0.055
+        if (curtain < 0.004) curtain = 0
+
+        dissolve.current.style.opacity = Math.max(curtain, dip * 0.82).toFixed(3)
       }
 
       frame = requestAnimationFrame(loop)
@@ -106,19 +177,28 @@ export function Overlay() {
   }, [])
 
   return (
-    <div className="overlay">
+    <div className="overlay" ref={root}>
       <div className="marker" ref={marker}>
         <span className="numeral" ref={numeral} />
         <span ref={title} />
       </div>
+
+      <div className="rail" ref={rail}>
+        {ACTS.map((a) => <i key={a.id} data-on="false" />)}
+      </div>
+
+      <Annotations />
 
       <div className="wordmark" ref={wordmark}>
         <h1>MALUS</h1>
         <p>everything inside one apple</p>
       </div>
 
-      <p className="line" ref={line} />
-      <p className="question" ref={question} />
+      <div className="copy">
+        <p className="line" ref={line} />
+        <p className="detail" ref={detail} />
+        <p className="question" ref={question} />
+      </div>
       <div className="invite" ref={invite}>scroll</div>
 
       {audioSupported() && (
@@ -133,6 +213,8 @@ export function Overlay() {
           <span>{sound ? 'sound on' : 'sound'}</span>
         </button>
       )}
+
+      <div className="dissolve" ref={dissolve} />
     </div>
   )
 }

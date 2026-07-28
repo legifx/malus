@@ -12,17 +12,21 @@ const OUT = process.argv[2] ?? 'shots/sweep'
 const W = Number(process.argv[3] ?? 1400)
 const H = Number(process.argv[4] ?? 900)
 
+// Act boundaries moved when act I was lengthened; these are act-local t values
+// converted against TOTAL_VH = 27.5.
 const FRAMES = [
-  ['01-fall-mid', 0.075],
-  ['02-fall-impact', 0.092],
-  ['03-skin', 0.202],
-  ['04-bite-crisp', 0.318],
-  ['05-bite-mealy', 0.399],
-  ['06-star', 0.560],
-  ['07-time', 0.678],
-  ['08-orchard', 0.817],
-  ['09-orchard-dark', 0.888],
-  ['10-seed', 0.923],
+  ['01-fall-impact', 0.109],
+  ['02-fall-copy', 0.145],
+  ['03-boundary-in', 0.1770],
+  ['04-boundary-at', 0.1818],
+  ['05-skin', 0.2391],
+  ['06-bite-crisp', 0.3582],
+  ['07-bite-mealy', 0.4300],
+  ['08-star', 0.5810],
+  ['09-time', 0.6955],
+  ['10-orchard', 0.8000],
+  ['11-orchard-dark', 0.8909],
+  ['12-seed', 0.9364],
 ]
 
 await mkdir(OUT, { recursive: true })

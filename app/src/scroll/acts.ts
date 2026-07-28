@@ -16,6 +16,12 @@ export interface ActDef {
   title: string
   /** The one world-model-correcting sentence. Brief, law 2. */
   line: string
+  /**
+   * The substance under it. Law 2 caps the HEADLINE at one sentence per act;
+   * it never said the act may not explain itself. Set small and quiet so it
+   * reads as annotation rather than as a second headline.
+   */
+  detail: string
   /** The open question the act ends on. Brief, law 7. */
   question: string
   vh: number
@@ -26,15 +32,19 @@ export const ACTS: ActDef[] = [
     id: 'fall',
     numeral: 'I',
     title: 'FALL',
-    line: 'It fell for four seconds and rearranged physics.',
+    line: 'It fell straight down. Someone asked why down — and the answer reached the moon.',
+    detail: 'Scrolling is the gravity here. The distance the fruit has fallen grows with the square of how far you have scrolled, so its speed climbs steadily and evenly. That is free fall, and you are the one supplying it.',
     question: 'What else is hiding in something this ordinary?',
-    vh: 3.5,
+    // Longer than the rest: everything after the landing — wordmark, line,
+    // detail, question — has to play out inside this one act.
+    vh: 5,
   },
   {
     id: 'skin',
     numeral: 'II',
     title: 'SKIN',
     line: 'The shine is not polish. It is a shield the fruit builds to turn ultraviolet light into heat.',
+    detail: 'What you are watching is three numbers moving. Specular reflectance, diffuse reflectance, and the width of the highlight — the three parameters that gloss-selective neurons in the visual cortex are tuned to. Here they arrive one at a time, which never happens in life.',
     question: 'So what is underneath it?',
     vh: 3.5,
   },
@@ -43,6 +53,7 @@ export const ACTS: ActDef[] = [
     numeral: 'III',
     title: 'BITE',
     line: 'Crisp and mealy are not freshness. They are two different ways for a crack to travel.',
+    detail: 'In a crisp apple the fracture runs through the cells. They burst under their own pressure and release what is inside — that is the juice, and that is the noise. In a mealy one the crack runs between them instead, so the cells come apart whole and dry. Same fruit, broken twice.',
     question: 'And if we cut instead of bit?',
     vh: 4.5,
   },
@@ -54,6 +65,7 @@ export const ACTS: ActDef[] = [
     // is nowhere in the research library. The pentagram's proportions are not a
     // claim about the world — they are provable geometry.
     line: 'Cut it across the middle. Five carpels make a star, and that star is built on the golden ratio.',
+    detail: 'Five chambers, each holding its seeds, with a ring of vascular bundles running between them and the skin. Join every second tip and the figure closes exactly — and in a regular pentagram the diagonal is longer than the side by a factor of 1.618.',
     question: 'What happens if we leave it open?',
     vh: 3.5,
   },
@@ -62,6 +74,7 @@ export const ACTS: ActDef[] = [
     numeral: 'V',
     title: 'TIME',
     line: 'It is not rotting. It is defending itself — and the browning is the wound closing.',
+    detail: 'Polyphenol oxidase reaches the phenols the moment a cut lets oxygen in, and the quinones it produces polymerise into the brown. It is an immune response. Ascorbic acid reduces those quinones back before they can set, which is why lemon works — and why the patch it reaches turns pale again instead of merely stopping.',
     question: 'Then what survives?',
     vh: 3.5,
   },
@@ -70,6 +83,7 @@ export const ACTS: ActDef[] = [
     numeral: 'VI',
     title: 'ORCHARD',
     line: 'You were never the farmer. You were the deal.',
+    detail: 'Domestication is best modelled as a plant\'s answer to being eaten: sweet, large and red recruited a species that would carry the seeds across continents. Every fruit here is genuinely different, because an apple grown from seed never resembles its parent. A named variety is one tree, grafted ever since.',
     question: 'What did we agree to?',
     vh: 5,
   },
@@ -78,6 +92,7 @@ export const ACTS: ActDef[] = [
     numeral: '',
     title: 'SEED',
     line: 'Every seed is a stranger. Every named apple is one tree, copied.',
+    detail: 'You began on a point of light in the dark. So does this.',
     question: '',
     vh: 2.5,
   },
@@ -141,4 +156,6 @@ export const signals = {
   drop: 0,
   /** Act VI — how much of the orchard has gone out. */
   dark: 0,
+  /** 1 once the renderer has produced enough frames to be lit. */
+  ready: 0,
 }

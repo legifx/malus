@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import CustomShaderMaterial from 'three-custom-shader-material'
 import { Apple } from '../components/Apple'
@@ -7,6 +7,7 @@ import { makeCutDisc, CUT_AT } from '../geometry/cutDisc'
 import { cutFaceVertex, cutFaceFragment, CUT_FACE_DEFAULTS } from '../materials/cutFace'
 import { useActReady, HERO_DETAIL } from '../scroll/useActReady'
 import { useMalus } from '../store'
+import { setPose } from '../scene/CameraRig'
 import { scroll, signals } from '../scroll/acts'
 
 /**
@@ -58,7 +59,6 @@ function TimeBody() {
   const detail = HERO_DETAIL[quality]
   const root = useRef<THREE.Group>(null)
   const drop = useRef<THREE.Mesh>(null)
-  const camera = useThree((s) => s.camera)
 
   const { geometry: disc, radius } = useMemo(() => makeCutDisc(7, detail), [detail])
   const planeLower = useMemo(() => new THREE.Plane(new THREE.Vector3(0, -1, 0), CUT_AT), [])
@@ -109,8 +109,7 @@ function TimeBody() {
     // The disc is a unit across; at 2.9 units it spanned 38° of a 34° field and
     // spilled out of frame on every side.
     const dist = 3.9 + smoothstep(DROP_AT, 1.0, t) * 0.9
-    camera.position.set(0.12, CUT_AT + dist, 0.5)
-    camera.lookAt(0, CUT_AT, 0)
+    setPose(0.12, CUT_AT + dist, 0.5, 0, CUT_AT, 0)
   })
 
   return (

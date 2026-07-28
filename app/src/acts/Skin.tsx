@@ -1,9 +1,10 @@
 import { useMemo, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { Apple } from '../components/Apple'
 import { useActReady, HERO_DETAIL } from '../scroll/useActReady'
 import { useMalus } from '../store'
+import { setPose, setPoseV } from '../scene/CameraRig'
 import { scroll } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
@@ -52,6 +53,9 @@ const UV_IN = [0.66, 0.80] as const
  * first render and the gate would buy nothing. Only an unmounted subtree
  * actually skips the work.
  */
+const _cam = new THREE.Vector3()
+const _look = new THREE.Vector3()
+
 export function Skin() {
   const ready = useActReady(1)
   if (!ready) return null
@@ -63,7 +67,6 @@ function SkinBody() {
   const detail = HERO_DETAIL[quality]
   const root = useRef<THREE.Group>(null)
   const uv = useRef<THREE.Points>(null)
-  const camera = useThree((s) => s.camera)
   const skinRef = useRef<Record<string, { value: unknown }> | null>(null)
 
   const uvUniforms = useMemo(() => ({ uT: { value: 0 }, uOn: { value: 0 } }), [])
@@ -129,11 +132,10 @@ function SkinBody() {
     // therefore nothing to see while the three gloss axes were being swept —
     // which is the entire act.
     const dist = 2.05 + smoothstep(0.55, 1.0, t) * 0.85
-    camera.position.copy(radial).multiplyScalar(dist)
+    _cam.copy(radial).multiplyScalar(dist)
     // Looking down the radial gives a true macro view of the surface.
-    camera.lookAt(radial.clone().multiplyScalar(0.18))
-    // A slow roll keeps the frame alive without moving the subject.
-    camera.rotateZ(Math.sin(t * 1.7) * 0.09 + state.clock.elapsedTime * 0.0)
+    _look.copy(radial).multiplyScalar(0.18)
+    setPoseV(_cam, _look)
 
     const on = smoothstep(UV_IN[0], UV_IN[1], t) * (1 - smoothstep(0.93, 1.0, t))
     uvUniforms.uOn.value = on

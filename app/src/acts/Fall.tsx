@@ -1,9 +1,10 @@
 import { useMemo, useRef, useState, useCallback } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { Apple } from '../components/Apple'
 import { useActReady, HERO_DETAIL } from '../scroll/useActReady'
 import { useMalus } from '../store'
+import { setPose, setPoseV } from '../scene/CameraRig'
 import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
@@ -20,7 +21,10 @@ import { rng } from '../lib/noise'
  */
 
 const ACT = 0
-const IMPACT_AT = 0.66 // fraction of the act spent falling
+// Earlier than it looks like it should be: everything after the landing —
+// wordmark, then line, then detail, then question — has to play out in the
+// remainder, and they must never share the frame.
+const IMPACT_AT = 0.52 // fraction of the act spent falling
 
 const START = new THREE.Vector3(1.2, 58, -22)
 const REST = new THREE.Vector3(0, 0, 0)
@@ -41,6 +45,9 @@ const smoothstep = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t)
 }
 
+const _cam = new THREE.Vector3()
+const _look = new THREE.Vector3()
+
 export function Fall() {
   const quality = useMalus((st) => st.quality)
   const detail = HERO_DETAIL[quality]
@@ -50,7 +57,6 @@ export function Fall() {
   const shock = useRef<THREE.Mesh>(null)
   const dust = useRef<THREE.Points>(null)
   const [restY, setRestY] = useState(0.87)
-  const camera = useThree((s) => s.camera)
 
   const onMetrics = useCallback((m: { restY: number }) => setRestY(m.restY), [])
 
@@ -142,11 +148,11 @@ export function Fall() {
     // So the target follows the fruit, held below it so it sits above centre
     // and reads as falling INTO frame, and only hands over to the impact point
     // in the last stretch.
-    camera.position.lerpVectors(CAM_HIGH, CAM_LOW, smoothstep(0.0, 1.0, fallT))
+    _cam.lerpVectors(CAM_HIGH, CAM_LOW, smoothstep(0.0, 1.0, fallT))
     const lead = 0.35 + 2.2 * (1 - fallT)
-    const look = p.clone().setY(p.y - lead)
-    look.lerp(GROUND_LOOK, smoothstep(0.86, 1.0, fallT))
-    camera.lookAt(look)
+    _look.copy(p).setY(p.y - lead)
+    _look.lerp(GROUND_LOOK, smoothstep(0.86, 1.0, fallT))
+    setPoseV(_cam, _look)
 
     // Shockwave.
     shockUniforms.uT.value = after

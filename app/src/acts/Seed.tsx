@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { fbm3 } from '../lib/noise'
 import { useActReady } from '../scroll/useActReady'
+import { setPose } from '../scene/CameraRig'
 import { scroll } from '../scroll/acts'
 
 /**
@@ -68,7 +69,9 @@ function SeedBody() {
   const root = useRef<THREE.Group>(null)
   const spin = useRef<THREE.Group>(null)
   const glow = useRef<THREE.Mesh>(null)
-  const camera = useThree((s) => s.camera)
+  // Read-only: the rig owns where the camera goes, but the glow still has to
+  // face it.
+  const camera = useThree((st) => st.camera)
 
   const geometry = useMemo(() => makeSeedGeometry(), [])
 
@@ -108,8 +111,7 @@ function SeedBody() {
     // The pip is 2.9 long and 1.24 across. At 0.62 the camera sat 0.18 outside
     // its own surface and the frame was solid brown.
     const away = smoothstep(0.30, 0.92, t)
-    camera.position.set(0, 0.05, 4.4 + away * 30.0)
-    camera.lookAt(0, 0, 0)
+    setPose(0, 0.05, 4.4 + away * 30.0, 0, 0, 0)
 
     // The glow takes over from the object exactly as the object stops being
     // resolvable, so the transition from thing to point has no seam.

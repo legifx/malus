@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import CustomShaderMaterial from 'three-custom-shader-material'
 import { Apple } from '../components/Apple'
@@ -7,6 +7,7 @@ import { makeCutDisc, CUT_AT } from '../geometry/cutDisc'
 import { cutFaceVertex, cutFaceFragment, CUT_FACE_DEFAULTS } from '../materials/cutFace'
 import { useActReady, HERO_DETAIL } from '../scroll/useActReady'
 import { useMalus } from '../store'
+import { setPose, setPoseV } from '../scene/CameraRig'
 import { scroll } from '../scroll/acts'
 
 /**
@@ -38,6 +39,9 @@ const smoothstep = (a: number, b: number, x: number) => {
  * first render and the gate would buy nothing. Only an unmounted subtree
  * actually skips the work.
  */
+const _cam = new THREE.Vector3()
+const _look = new THREE.Vector3()
+
 export function Star() {
   const ready = useActReady(3)
   if (!ready) return null
@@ -50,7 +54,6 @@ function StarBody() {
   const root = useRef<THREE.Group>(null)
   const topHalf = useRef<THREE.Group>(null)
   const spin = useRef<THREE.Group>(null)
-  const camera = useThree((s) => s.camera)
 
   const { geometry: disc, radius } = useMemo(() => makeCutDisc(7, detail), [detail])
 
@@ -109,8 +112,8 @@ function StarBody() {
     // single apple already spanned 31° of a 34° field.
     const side = new THREE.Vector3(0, 0.5, 3.9)
     const above = new THREE.Vector3(1.0, 6.8, 1.2)
-    camera.position.lerpVectors(side, above, overhead)
-    camera.lookAt(overhead * 1.0, CUT_AT, 0)
+    _cam.lerpVectors(side, above, overhead)
+    setPose(_cam.x, _cam.y, _cam.z, overhead * 1.0, CUT_AT, 0)
   })
 
   return (

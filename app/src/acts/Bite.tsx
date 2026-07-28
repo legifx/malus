@@ -1,11 +1,12 @@
 import { useMemo, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import CustomShaderMaterial from 'three-custom-shader-material'
 import { makeFracturedApple } from '../geometry/fracture'
 import { appleBurstVertex, appleBurstFragment, APPLE_BURST_DEFAULTS } from '../materials/appleBurst'
 import { useActReady, FRACTURE } from '../scroll/useActReady'
 import { useMalus } from '../store'
+import { setPose } from '../scene/CameraRig'
 import { scroll, signals } from '../scroll/acts'
 import { rng } from '../lib/noise'
 
@@ -60,7 +61,6 @@ function BiteBody() {
   const root = useRef<THREE.Group>(null)
   const spin = useRef<THREE.Group>(null)
   const juice = useRef<THREE.Points>(null)
-  const camera = useThree((s) => s.camera)
 
   const { geometry, restY } = useMemo(
     () => makeFracturedApple({ ...FRACTURE[quality], seed: 7, origin: ORIGIN, character: 0.38 }),
@@ -151,8 +151,8 @@ function BiteBody() {
     // …and follow the debris down. Gravity carries the cloud well below the
     // origin by the end of a break, and a mealy one crumbles almost straight
     // down — aiming at the start point drops it out of the bottom of frame.
-    camera.position.set(0, restY + 0.5 + spread * 0.9, dist)
-    camera.lookAt(0, restY - spread * 0.4 - spread * spread * 1.5, 0)
+    setPose(0, restY + 0.5 + spread * 0.9, dist,
+            0, restY - spread * 0.4 - spread * spread * 1.5, 0)
   })
 
   return (
