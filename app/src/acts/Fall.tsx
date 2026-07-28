@@ -26,7 +26,10 @@ const ACT = 0
 // remainder, and they must never share the frame.
 const IMPACT_AT = 0.52 // fraction of the act spent falling
 
-const START = new THREE.Vector3(1.2, 58, -22)
+// Brought in from 58/-22. The opening frame is the one most likely to be
+// screenshotted and judged, and at that distance the fruit was a speck; this
+// is about a quarter larger without meaningfully shortening the fall.
+const START = new THREE.Vector3(1.0, 46, -17)
 const REST = new THREE.Vector3(0, 0, 0)
 
 // Aimed along the line to the apple's start, a few degrees below it, so the

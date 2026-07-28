@@ -64,8 +64,8 @@ export const ACTS: ActDef[] = [
     // "People burned for less" was cut: it gestures at witch-trial history that
     // is nowhere in the research library. The pentagram's proportions are not a
     // claim about the world — they are provable geometry.
-    line: 'Cut it across the middle. Five carpels make a star, and that star is built on the golden ratio.',
-    detail: 'Five chambers, each holding its seeds, with a ring of vascular bundles running between them and the skin. Join every second tip and the figure closes exactly — and in a regular pentagram the diagonal is longer than the side by a factor of 1.618.',
+    line: 'Cut it across the middle. Five carpels, and the star they describe.',
+    detail: 'Five chambers, each holding its seeds, with a ring of vascular bundles running between them and the skin. Join every second tip and the figure closes on itself. Drawn regular, as it is here, its diagonal is longer than its side by exactly the golden ratio — a real fruit is never quite that tidy.',
     question: 'What happens if we leave it open?',
     vh: 3.5,
   },

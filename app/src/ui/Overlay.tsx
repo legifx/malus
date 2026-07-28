@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ACTS, scroll, signals } from '../scroll/acts'
 import { enableAudio, disableAudio, audioSupported } from '../audio/engine'
+import { scrollToAct } from '../scroll/ScrollDriver'
 import { Annotations } from './Annotations'
 import './overlay.css'
 
@@ -74,12 +75,15 @@ export function Overlay() {
   const invite = useRef<HTMLDivElement>(null)
   const rail = useRef<HTMLDivElement>(null)
   const dissolve = useRef<HTMLDivElement>(null)
+  const opening = useRef<HTMLDivElement>(null)
+  const colophon = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let frame = 0
     let shownAct = -1
     let curtain = 1
     let lastT = performance.now()
+    let bootGone = false
 
     const loop = () => {
       const { index, t, progress } = scroll
@@ -99,6 +103,24 @@ export function Overlay() {
           }
         }
         shownAct = index
+      }
+
+      // The opening frame used to be a small dark speck and the word "scroll".
+      // Nothing to look at, nothing to screenshot, and no sense of what the
+      // piece is. It now says what it is before it starts.
+      if (opening.current) {
+        const a = 1 - smooth(clamp01(progress / 0.010))
+        opening.current.style.opacity = String(a)
+        if (a < 0.01) opening.current.style.display = 'none'
+        else opening.current.style.display = ''
+      }
+
+      // The ending. Previously the piece simply stopped on a floating pip:
+      // no credits, no source, no way back to the beginning.
+      if (colophon.current) {
+        const a = smooth(clamp01((progress - 0.972) / 0.022))
+        colophon.current.style.opacity = String(a)
+        colophon.current.style.pointerEvents = a > 0.6 ? 'auto' : 'none'
       }
 
       const started = progress > 0.012
@@ -171,6 +193,14 @@ export function Overlay() {
         const now = performance.now()
         const dt = Math.min(0.1, (now - lastT) / 1000)
         lastT = now
+        // The inline boot loader hands over here — it exists so the first
+        // paint is never a blank rectangle, and it leaves as soon as the
+        // renderer is actually producing frames.
+        if (signals.ready && !bootGone) {
+          document.getElementById('boot')?.classList.add('gone')
+          bootGone = true
+        }
+
         const want = signals.ready ? 0 : 1
         curtain += (want - curtain) * (1 - Math.exp(-dt / 0.28))
         if (curtain < 0.004) curtain = 0
@@ -191,11 +221,28 @@ export function Overlay() {
         <span ref={title} />
       </div>
 
-      <div className="rail" ref={rail}>
-        {ACTS.map((a) => <i key={a.id} data-on="false" />)}
-      </div>
+      {/* The rail looked exactly like navigation and did nothing. It is
+          navigation now. */}
+      <nav className="rail" ref={rail} aria-label="Chapters">
+        {ACTS.map((a, i) => (
+          <button
+            key={a.id}
+            data-on="false"
+            onClick={() => scrollToAct(i)}
+            aria-label={`${a.numeral ? a.numeral + ' — ' : ''}${a.title}`}
+            title={a.title}
+          />
+        ))}
+      </nav>
 
       <Annotations />
+
+      <div className="opening" ref={opening}>
+        <p className="eyebrow">A 3D essay in seven acts</p>
+        <p className="premise">
+          Everything inside one apple — and none of it downloaded.
+        </p>
+      </div>
 
       <div className="wordmark" ref={wordmark}>
         <h1>MALUS</h1>
@@ -221,6 +268,22 @@ export function Overlay() {
           <span>{sound ? 'sound on' : 'sound'}</span>
         </button>
       )}
+
+      <div className="colophon" ref={colophon}>
+        <h2>MALUS</h2>
+        <p className="what">
+          Seven acts about the most ordinary object there is. The shape, the
+          skin, the fracture, the orchard and the sound are all generated in
+          code — there are no models, textures or audio files in this project.
+        </p>
+        <p className="tech">
+          three.js · React Three Fiber · custom GLSL · Web Audio · Lenis · Vite
+        </p>
+        <div className="ends">
+          <a href="https://github.com/legifx/malus" rel="noreferrer">Source</a>
+          <button onClick={() => scrollToAct(0)}>Again</button>
+        </div>
+      </div>
 
       <div className="dissolve" ref={dissolve} />
     </div>

@@ -41,7 +41,7 @@ export const ANNOTATIONS: Anno[] = [
     side: 'right',
     y: 0.34,
     label: 'Lenticel',
-    text: 'A pore. The fruit breathes through several thousand of them, and they keep breathing after it is picked.',
+    text: 'A pore. The fruit breathes through them, and goes on breathing through them after it is picked.',
   },
   {
     id: 'cuticle',

@@ -111,7 +111,9 @@ function SeedBody() {
     // The pip is 2.9 long and 1.24 across. At 0.62 the camera sat 0.18 outside
     // its own surface and the frame was solid brown.
     const away = smoothstep(0.30, 0.92, t)
-    setPose(0, 0.05, 4.4 + away * 30.0, 0, 0, 0)
+    // Aim below the pip as the camera retreats, so it rises into the upper
+    // frame and leaves the lower half to the closing text.
+    setPose(0, 0.05, 4.4 + away * 30.0, 0, -away * 4.5, 0)
 
     // The glow takes over from the object exactly as the object stops being
     // resolvable, so the transition from thing to point has no seam.

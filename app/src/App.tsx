@@ -63,7 +63,10 @@ export function App() {
     <>
       <div className="stage">
         <Canvas
-          shadows
+          // Stated explicitly: `shadows` defaults to PCFSoftShadowMap, which
+          // three has deprecated and silently downgrades — so the soft shadows
+          // were never actually being drawn, only warned about.
+          shadows={{ type: THREE.PCFShadowMap }}
           dpr={dpr}
           gl={{
             antialias: false,
@@ -92,7 +95,9 @@ export function App() {
           <PerformanceMonitor
             factor={1}
             onChange={({ factor }) =>
-              setDpr(Math.round(Math.max(0.65, 0.65 + factor * (maxDpr - 0.65)) * 20) / 20)
+              // Floor raised: below about 0.85 the softness is visible, and a
+              // blurry frame costs more than the frames it buys back.
+              setDpr(Math.round(Math.max(0.85, 0.85 + factor * (maxDpr - 0.85)) * 20) / 20)
             }
           />
           <Backdrop />

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import Lenis from 'lenis'
-import { scroll, locate, TOTAL_VH } from './acts'
+import { scroll, locate, TOTAL_VH, ACT_STARTS, ACTS } from './acts'
 import { useMalus } from '../store'
 
 /**
@@ -9,6 +9,21 @@ import { useMalus } from '../store'
  * Lives outside the Canvas because it owns DOM scrolling. It writes into a
  * mutable object rather than React state on purpose — see the note in acts.ts.
  */
+/**
+ * Jump to an act. Exposed so the chapter rail can actually be used as the
+ * navigation it looks like.
+ */
+let lenisRef: Lenis | null = null
+
+export function scrollToAct(index: number) {
+  if (!lenisRef) return
+  const max = document.documentElement.scrollHeight - window.innerHeight
+  // A little past the start, so the act is already doing something when you
+  // arrive rather than sitting on its own boundary dissolve.
+  const vh = ACT_STARTS[index] + ACTS[index].vh * 0.12
+  lenisRef.scrollTo(max * (vh / TOTAL_VH), { duration: 1.4 })
+}
+
 export function ScrollDriver() {
   const setAct = useMalus((s) => s.setAct)
 
@@ -26,6 +41,31 @@ export function ScrollDriver() {
     // instance and the live state so the headless capture tool can drive and
     // inspect the spine directly.
     ;(window as unknown as Record<string, unknown>).__lenis = lenis
+    lenisRef = lenis
+
+    // Lenis takes over scrolling and brings no keyboard handling of its own,
+    // so without this the page simply cannot be operated from a keyboard —
+    // arrows, Page keys and Home/End all did nothing.
+    const onKey = (e: KeyboardEvent) => {
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      const page = window.innerHeight * 0.9
+      const step = window.innerHeight * 0.28
+      let to: number | null = null
+      switch (e.key) {
+        case 'ArrowDown': to = lenis.scroll + step; break
+        case 'ArrowUp': to = lenis.scroll - step; break
+        case 'PageDown': case ' ': to = lenis.scroll + page; break
+        case 'PageUp': to = lenis.scroll - page; break
+        case 'Home': to = 0; break
+        case 'End': to = max; break
+        default: return
+      }
+      // Space still belongs to the sound button when it has focus.
+      if (e.key === ' ' && (e.target as HTMLElement)?.tagName === 'BUTTON') return
+      e.preventDefault()
+      lenis.scrollTo(Math.max(0, Math.min(max, to)), { duration: 0.9 })
+    }
+    window.addEventListener('keydown', onKey)
     ;(window as unknown as Record<string, unknown>).__scroll = scroll
 
     let frame = 0
@@ -55,6 +95,8 @@ export function ScrollDriver() {
 
     return () => {
       cancelAnimationFrame(frame)
+      window.removeEventListener('keydown', onKey)
+      lenisRef = null
       lenis.destroy()
     }
   }, [setAct])
