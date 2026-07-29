@@ -4,10 +4,10 @@ Autonomous build. State lives here and in git, not in context: each pass reads
 this file, does the next unchecked step, verifies it by rendering, commits, and
 ticks the box.
 
-**Live the whole time:** a private network address (tailnet, user's PC is
-the author's own machine). `systemctl --user restart malus` after every build.
-Vercel is not authenticated and login is interactive, so the tailnet service is
-the delivery path.
+**Live the whole time:** served from the build machine on a private network
+address, rebuilt and restarted after every step. Vercel was not authenticated
+and its login is interactive, so a local static service was the delivery path
+for the overnight run.
 
 ## Order, and why
 
@@ -16,7 +16,7 @@ that the ordering is "make the piece whole before making any part perfect" — a
 site where every act exists reads far better to a judge than two polished acts
 and four gaps.
 
-- [x] 0. Serve the build over the tailnet (systemd user unit `malus.service`)
+- [x] 0. Serve the build over the private network (systemd user unit)
 - [x] 1. Act II — SKIN. Macro on the cuticle, ρs/ρd/α driven directly.
 - [x] 2. Act IV — STAR. Equator cut, five carpels, the pentagram.
 - [x] 3. Act V — TIME. Enzymatic browning as reaction–diffusion, reversible.
@@ -38,7 +38,7 @@ and four gaps.
 
 ## Log
 
-- Service up; http 200 on both loopback and the tailnet address.
+- Service up; http 200 on both loopback and the private network address.
 - Act II SKIN done. Camera crawls the cuticle while ρs/ρd/α are swept one at a
   time, then ultraviolet arrives and is absorbed rather than reflected.
   Two fixes the render forced: at 1.24 units the surface went flat and the
@@ -114,5 +114,5 @@ and four gaps.
 
 ## Night run complete
 
-All eight steps done. Seven acts, audio, performance, polish. Live on
-a private network address and rebuilt after every step.
+All eight steps done. Seven acts, audio, performance, polish. Rebuilt and
+redeployed after every step.
