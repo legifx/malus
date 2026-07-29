@@ -51,6 +51,17 @@ export function Annotations() {
 
         if (alpha < 0.005) continue
 
+        // A caption sitting on its own subject needs no leader line.
+        if (a.place === 'caption') {
+          el.style.left = `${p.x}px`
+          el.style.right = 'auto'
+          el.style.top = `${p.y}px`
+          el.style.textAlign = 'center'
+          path.style.opacity = '0'
+          dot.style.opacity = '0'
+          continue
+        }
+
         const labelX = a.side === 'left' ? marginL : marginR
         const labelY = a.y * H
 
@@ -93,7 +104,12 @@ export function Annotations() {
       </svg>
 
       {ANNOTATIONS.map((a) => (
-        <div className="anno-label" key={a.id} ref={(el) => { labels.current[a.id] = el }}>
+        <div
+          className="anno-label"
+          data-place={a.place ?? 'margin'}
+          key={a.id}
+          ref={(el) => { labels.current[a.id] = el }}
+        >
           <b>{a.label}</b>
           <span>{a.text}</span>
         </div>

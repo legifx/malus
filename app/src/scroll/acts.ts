@@ -53,7 +53,7 @@ export const ACTS: ActDef[] = [
     numeral: 'III',
     title: 'BITE',
     line: 'Crisp and mealy are not freshness. They are two different ways for a crack to travel.',
-    detail: 'In a crisp apple the fracture runs through the cells. They burst under their own pressure and release what is inside — that is the juice, and that is the noise. In a mealy one the crack runs between them instead, so the cells come apart whole and dry. Same fruit, broken twice.',
+    detail: 'Two apples, the same instant, the same force. On the left the cells are full and under pressure, so the crack goes straight through them: they burst, and what was inside comes out as juice and as noise. On the right that pressure is gone, so the crack takes the easier path between the cells — they separate whole, and what falls out is dust.',
     question: 'And if we cut instead of bit?',
     vh: 4.5,
   },

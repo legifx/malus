@@ -55,18 +55,27 @@ export const appleBurstVertex = /* glsl */ `
     vec3 dir = normalize(aCellCentre - uOrigin * 0.55 + rnd * 0.38);
 
     // A crisp fruit stores elastic energy in turgid cells and releases it; a
-    // mealy one has nothing to release and simply falls apart.
-    float energy = mix(0.42, 1.55, uTurgor) * (0.55 + 0.9 * fract(aCellSeed * 7.31));
+    // mealy one has nothing to release and simply comes apart under its own
+    // weight. The gap is deliberately wide: shown side by side, the difference
+    // has to be legible in silhouette alone.
+    float energy = mix(0.14, 1.80, uTurgor) * (0.55 + 0.9 * fract(aCellSeed * 7.31));
     // Fragments near the strike leave fastest.
     energy *= 0.45 + 1.25 * exp(-length(aCellCentre - uOrigin) * 1.15);
 
-    vec3 offset = dir * energy * t * 0.95;
-    offset.y -= 2.5 * t * t * (0.45 + 0.95 * fract(aCellSeed * 13.17)); // gravity
+    // Mealy tissue lets go progressively rather than all at once, so its
+    // break starts later and keeps crumbling — a slump, not a burst.
+    float tt = mix(pow(t, 1.9), t, uTurgor);
+
+    vec3 offset = dir * energy * tt * 0.95;
+    // Eased back: at 2.5 the debris fell so far below the origin that both
+    // piles left the bottom of the frame and buried the copy.
+    offset.y -= 1.65 * tt * tt * (0.45 + 0.95 * fract(aCellSeed * 13.17)); // gravity
 
     // Spin about the fragment's own centre. Rotating the normal with it is what
     // keeps the shard lit correctly as it tumbles.
     vec3 axis = normalize(rnd + vec3(0.0031, 0.0017, 0.0023));
-    float ang = t * (1.8 + 6.5 * fract(aCellSeed * 3.77)) * mix(0.45, 1.0, uTurgor);
+    // Crisp shards are thrown and tumble; mealy lumps barely turn at all.
+    float ang = tt * (1.8 + 6.5 * fract(aCellSeed * 3.77)) * mix(0.12, 1.0, uTurgor);
 
     vec3 local = rotAxis(position - aCellCentre, axis, ang);
     csm_Position = aCellCentre + local + offset;
@@ -117,8 +126,11 @@ export const appleBurstFragment = /* glsl */ `
     // that made this face were ruptured.
     // Not white. Apple parenchyma is a warm cream with a green cast; pushed to
     // white it stops being tissue and starts being paper.
-    vec3 fleshPale = vec3(0.729, 0.659, 0.451);
-    vec3 fleshDeep = vec3(0.573, 0.510, 0.337);
+    // Mealy tissue has lost its water: it goes pale, chalky and slightly grey.
+    // Crisp tissue is wet, so it is darker and warmer than dry flesh, not
+    // lighter — the intuition most people have about this is backwards.
+    vec3 fleshPale = mix(vec3(0.800, 0.769, 0.678), vec3(0.729, 0.659, 0.451), uTurgor);
+    vec3 fleshDeep = mix(vec3(0.667, 0.639, 0.561), vec3(0.573, 0.510, 0.337), uTurgor);
 
     // The cell mosaic. This is the whole visual argument of the act: a mealy
     // break exposes INTACT cells, so the face is a granular mosaic. A crisp
@@ -155,14 +167,16 @@ export const appleBurstFragment = /* glsl */ `
     // proud of the surface — and a crisp one is nearly smooth.
     vec3 nrm = normalize(vWorldNormal);
     if (isCut > 0.5) {
-      float relief = (1.0 - grain) * mix(1.0, 0.28, uTurgor)
+      // Mealy faces are a mosaic of whole cells standing proud of the surface;
+      // crisp ones are cut straight through and nearly smooth.
+      float relief = (1.0 - grain) * mix(1.7, 0.18, uTurgor)
                    + 0.35 * fbm(vWorldPos * 26.0 + 7.0, 2);
       vec3 dpx = dFdx(vWorldPos), dpy = dFdy(vWorldPos);
       float dhx = dFdx(relief), dhy = dFdy(relief);
       vec3 c1 = cross(dpy, nrm), c2 = cross(nrm, dpx);
       float det = dot(dpx, c1);
       vec3 grad = sign(det) * (dhx * c1 + dhy * c2);
-      nrm = normalize(abs(det) * nrm - 0.0062 * grad);
+      nrm = normalize(abs(det) * nrm - mix(0.011, 0.0045, uTurgor) * grad);
       csm_FragNormal = normalize(mat3(viewMatrix) * nrm);
     }
 
@@ -172,10 +186,10 @@ export const appleBurstFragment = /* glsl */ `
     float skinRough = uAlpha;
     // Wet flesh has a broad soft sheen, not a lacquer. Pushed glossier it
     // stops looking wet and starts looking like crumpled foil.
-    float cutRough = mix(0.94, 0.46, uTurgor) + (1.0 - uTurgor) * 0.20 * grain;
+    float cutRough = mix(0.98, 0.34, uTurgor) + (1.0 - uTurgor) * 0.24 * grain;
     csm_Roughness = clamp(mix(skinRough, cutRough, isCut), 0.05, 1.0);
     csm_Metalness = 0.0;
-    csm_Clearcoat = uRhoS * (1.0 - isCut) + isCut * uTurgor * 0.16;
+    csm_Clearcoat = uRhoS * (1.0 - isCut) + isCut * uTurgor * 0.34;
     csm_ClearcoatRoughness = clamp(uAlpha * 0.42 + isCut * 0.25, 0.02, 1.0);
 
     // Apple flesh is markedly translucent — a backlit slice glows. Kept on the

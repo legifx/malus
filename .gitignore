@@ -24,3 +24,7 @@ research/
 
 # Links the repo to a Vercel account/team. Vercel gitignores this by default.
 .vercel
+
+# Playwright browsers, kept out of ~/.cache because that gets swept.
+.pw-browsers/
+.env.tools

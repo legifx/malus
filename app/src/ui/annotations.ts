@@ -18,10 +18,17 @@ export interface Anno {
   at: readonly [number, number, number, number]
   /** World-space point on the object. */
   anchor: THREE.Vector3
-  /** Which margin the label sits in. */
+  /** Which margin the label sits in. Ignored when place is 'under'. */
   side: 'left' | 'right'
-  /** 0..1 down the viewport. */
+  /** 0..1 down the viewport. Ignored when place is 'under'. */
   y: number
+  /**
+   * 'margin' runs a leader line out to a column of text; 'caption' sets the
+   * label directly above the anchor with no line. A side-by-side comparison
+   * needs the second kind — a leader line to a caption sitting on its own
+   * subject is just a longer way of pointing at it.
+   */
+  place?: 'margin' | 'caption'
   label: string
   text: string
 }
@@ -55,15 +62,29 @@ export const ANNOTATIONS: Anno[] = [
   },
 
   // --- III BITE -----------------------------------------------------------
+  // Captions under each fruit. Without them the reader has to work out which
+  // apple is which while both are already in pieces.
   {
-    id: 'turgor',
+    id: 'crisp',
     act: 2,
-    at: [0.03, 0.09, 0.13, 0.17],
-    anchor: new THREE.Vector3(0.30, 0.95, 0.55),
+    at: [0.06, 0.13, 0.94, 0.99],
+    anchor: new THREE.Vector3(-1.62, 1.35, 0),
+    side: 'left',
+    y: 0,
+    place: 'caption',
+    label: 'Crisp · high turgor',
+    text: 'The crack runs through the cells. They burst, and what was inside them comes out.',
+  },
+  {
+    id: 'mealy',
+    act: 2,
+    at: [0.06, 0.13, 0.94, 0.99],
+    anchor: new THREE.Vector3(1.62, 1.35, 0),
     side: 'right',
-    y: 0.30,
-    label: 'Turgor',
-    text: 'Water pressure inside every living cell. It is what a crisp apple is made of, and what a mealy one has lost.',
+    y: 0,
+    place: 'caption',
+    label: 'Mealy · low turgor',
+    text: 'The crack runs between them. The cells come apart whole, and dry.',
   },
 
   // --- IV STAR ------------------------------------------------------------
